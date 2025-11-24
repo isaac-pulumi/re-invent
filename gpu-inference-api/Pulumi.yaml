@@ -1,0 +1,11 @@
+name: gpu-inference-api
+description: GPU-powered AI inference API on AWS ECS
+runtime:
+  name: python
+  options:
+    toolchain: pip
+    virtualenv: venv
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-python
