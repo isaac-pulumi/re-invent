@@ -709,7 +709,6 @@ ecs_service = aws.ecs.Service(
     cluster=ecs_cluster.arn,
     task_definition=task_definition.arn,
     desired_count=1,
-    launch_type="EC2",
     scheduling_strategy="REPLICA",
     deployment_maximum_percent=200,
     deployment_minimum_healthy_percent=100,
