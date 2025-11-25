@@ -9,6 +9,7 @@ This Pulumi program creates a production-ready GPU inference API infrastructure 
 - CloudWatch monitoring and logging
 """
 
+import base64
 import pulumi
 import pulumi_aws as aws
 
@@ -497,11 +498,13 @@ ecs_gpu_ami = aws.ec2.get_ami(
 
 # User data script to configure ECS agent and GPU support
 user_data = pulumi.Output.all(ecs_cluster.name).apply(
-    lambda args: f"""#!/bin/bash
+    lambda args: base64.b64encode(
+        f"""#!/bin/bash
 echo ECS_CLUSTER={args[0]} >> /etc/ecs/ecs.config
 echo ECS_ENABLE_GPU_SUPPORT=true >> /etc/ecs/ecs.config
 echo ECS_ENABLE_CONTAINER_METADATA=true >> /etc/ecs/ecs.config
-"""
+""".encode()
+    ).decode()
 )
 
 # Launch template for GPU instances
@@ -513,7 +516,7 @@ launch_template = aws.ec2.LaunchTemplate(
         arn=ecs_instance_profile.arn,
     ),
     vpc_security_group_ids=[ecs_security_group.id],
-    user_data=user_data.apply(lambda ud: pulumi.Output.secret(ud).apply(lambda s: s)),
+    user_data=user_data,
     block_device_mappings=[
         aws.ec2.LaunchTemplateBlockDeviceMappingArgs(
             device_name="/dev/xvda",
