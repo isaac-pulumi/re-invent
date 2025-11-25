@@ -1,4 +1,4 @@
-environment:
-  - aws-login_v2/pulumi-dev-sandbox-env
 config:
   aws:region: us-west-2
+environment:
+  - pulumi-idp/aws-local
