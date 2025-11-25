@@ -163,7 +163,7 @@ for i, subnet in enumerate(private_subnets):
 # ============================================================================
 
 # Create S3 bucket for storing ML models
-model_bucket = aws.s3.BucketV2(
+model_bucket = aws.s3.Bucket(
     "model-bucket",
     tags={
         "Name": f"{project_name}-{environment}-models",
@@ -173,21 +173,21 @@ model_bucket = aws.s3.BucketV2(
 )
 
 # Enable versioning for model tracking
-bucket_versioning = aws.s3.BucketVersioningV2(
+bucket_versioning = aws.s3.BucketVersioning(
     "model-bucket-versioning",
     bucket=model_bucket.id,
-    versioning_configuration=aws.s3.BucketVersioningV2VersioningConfigurationArgs(
+    versioning_configuration=aws.s3.BucketVersioningVersioningConfigurationArgs(
         status="Enabled",
     ),
 )
 
 # Enable server-side encryption
-bucket_encryption = aws.s3.BucketServerSideEncryptionConfigurationV2(
+bucket_encryption = aws.s3.BucketServerSideEncryptionConfiguration(
     "model-bucket-encryption",
     bucket=model_bucket.id,
     rules=[
-        aws.s3.BucketServerSideEncryptionConfigurationV2RuleArgs(
-            apply_server_side_encryption_by_default=aws.s3.BucketServerSideEncryptionConfigurationV2RuleApplyServerSideEncryptionByDefaultArgs(
+        aws.s3.BucketServerSideEncryptionConfigurationRuleArgs(
+            apply_server_side_encryption_by_default=aws.s3.BucketServerSideEncryptionConfigurationRuleApplyServerSideEncryptionByDefaultArgs(
                 sse_algorithm="AES256",
             ),
             bucket_key_enabled=True,
@@ -206,21 +206,21 @@ bucket_public_access_block = aws.s3.BucketPublicAccessBlock(
 )
 
 # Lifecycle policy to manage old model versions
-bucket_lifecycle = aws.s3.BucketLifecycleConfigurationV2(
+bucket_lifecycle = aws.s3.BucketLifecycleConfiguration(
     "model-bucket-lifecycle",
     bucket=model_bucket.id,
     rules=[
-        aws.s3.BucketLifecycleConfigurationV2RuleArgs(
+        aws.s3.BucketLifecycleConfigurationRuleArgs(
             id="delete-old-versions",
             status="Enabled",
-            noncurrent_version_expiration=aws.s3.BucketLifecycleConfigurationV2RuleNoncurrentVersionExpirationArgs(
+            noncurrent_version_expiration=aws.s3.BucketLifecycleConfigurationRuleNoncurrentVersionExpirationArgs(
                 noncurrent_days=90,
             ),
         ),
-        aws.s3.BucketLifecycleConfigurationV2RuleArgs(
+        aws.s3.BucketLifecycleConfigurationRuleArgs(
             id="abort-incomplete-uploads",
             status="Enabled",
-            abort_incomplete_multipart_upload=aws.s3.BucketLifecycleConfigurationV2RuleAbortIncompleteMultipartUploadArgs(
+            abort_incomplete_multipart_upload=aws.s3.BucketLifecycleConfigurationRuleAbortIncompleteMultipartUploadArgs(
                 days_after_initiation=7,
             ),
         ),
