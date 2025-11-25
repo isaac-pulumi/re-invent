@@ -1,0 +1,4 @@
+environment:
+  - pulumi-idp/aws-local
+config:
+  aws:region: us-west-2

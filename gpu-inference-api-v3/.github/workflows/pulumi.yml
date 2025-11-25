@@ -1,0 +1,44 @@
+name: Pulumi Deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'gpu-inference-api-v3/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'gpu-inference-api-v3/**'
+
+jobs:
+  preview:
+    name: Preview
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pulumi/actions@v5
+        with:
+          command: preview
+          stack-name: test-org-ijh/gpu-inference-api-v3/dev
+          work-dir: gpu-inference-api-v3
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: test-org-ijh/gpu-inference-api-v3/dev
+          work-dir: gpu-inference-api-v3
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
